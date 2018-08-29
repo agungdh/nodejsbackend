@@ -28,11 +28,20 @@ app.get('/mahasiswa', (req, res) => {
 app.get('/mahasiswa/:npm', (req, res) => {
 	var params = req.params
 
-	connection.query('SELECT * FROM mahasiswa WHERE npm = ?', [params.npm], function (err, rows, fields) {
+	connection.query('SELECT count(*) total FROM mahasiswa WHERE npm = ?', [params.npm], function (err, rows, fields) {
 	  if (err) throw err
 
-	  res.json(rows)
-	})
+	  	if (rows[0].total != '0') {
+	  		connection.query('SELECT * FROM mahasiswa WHERE npm = ?', [params.npm], function (err2, rows2, fields2) {
+			  if (err2) throw err2
+
+			  res.json(rows2[0])
+			})
+	  	} else {
+	  		res.status(404);
+			res.json({'status' : false, 'description' : 'NPM is not exist!'})
+	  	}
+  	})
 })
 
 app.post('/mahasiswa', (req, res) => {
@@ -48,6 +57,7 @@ app.post('/mahasiswa', (req, res) => {
 		  res.json({'status' : true})
 		})
 	  } else {
+	  	res.status(409);
 	  	res.json({'status' : false, 'description' : 'NPM already exist!'})
 	  }
 	})
@@ -67,6 +77,7 @@ app.put('/mahasiswa/:npm', (req, res) => {
 			  res.json({'status' : true})
 			})
 		} else {
+			res.status(404);
 			res.json({'status' : false, 'description' : 'NPM is not exist!'})
 		}
 	})
@@ -85,6 +96,7 @@ app.delete('/mahasiswa/:npm', (req, res) => {
 			  res.json({'status' : true})
 			})
 		} else {
+			res.status(404);
 			res.json({'status' : false, 'description' : 'NPM is not exist!'})
 		}
 	})
