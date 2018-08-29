@@ -27,6 +27,7 @@ app.get('/mahasiswa', (req, res) => {
 
 app.get('/mahasiswa/:npm', (req, res) => {
 	var params = req.params
+
 	connection.query('SELECT * FROM mahasiswa WHERE npm = ?', [params.npm], function (err, rows, fields) {
 	  if (err) throw err
 
@@ -36,9 +37,55 @@ app.get('/mahasiswa/:npm', (req, res) => {
 
 app.post('/mahasiswa', (req, res) => {
 	var body = req.body
-	connection.query('INSERT INTO mahasiswa SET ?', {'npm' : body.npm, 'nama' : body.nama, 'alamat' : body.alamat, 'tanggallahir' : body.tanggallahir, 'jeniskelamin' : body.jeniskelamin, }, function (err, rows, fields) {
+
+	connection.query('SELECT count(*) total FROM mahasiswa WHERE npm = ?', [body.npm], function (err, rows, fields) {
 	  if (err) throw err
 
-	  res.json({'status' : true})
+	  if (rows[0].total == '0') {
+  		connection.query('INSERT INTO mahasiswa SET ?', {'npm' : body.npm, 'nama' : body.nama, 'alamat' : body.alamat, 'tanggallahir' : body.tanggallahir, 'jeniskelamin' : body.jeniskelamin}, function (err2, rows2, fields2) {
+		  if (err2) throw err2
+
+		  res.json({'status' : true})
+		})
+	  } else {
+	  	res.json({'status' : false, 'description' : 'NPM already exist!'})
+	  }
+	})
+})
+
+app.put('/mahasiswa/:npm', (req, res) => {
+	var params = req.params
+	var body = req.body
+
+	connection.query('SELECT count(*) total FROM mahasiswa WHERE npm = ?', [params.npm], function (err, rows, fields) {
+		if (err) throw err
+
+		if (rows[0].total != '0') {
+			connection.query('UPDATE mahasiswa SET npm = ?, nama = ?, alamat = ?, tanggallahir = ?, jeniskelamin = ? WHERE npm = ?', [body.npm, body.nama, body.alamat, body.tanggallahir, body.jeniskelamin, params.npm], function (err2, rows2, fields2) {
+			  if (err) throw err
+
+			  res.json({'status' : true})
+			})
+		} else {
+			res.json({'status' : false, 'description' : 'NPM is not exist!'})
+		}
+	})
+})
+
+app.delete('/mahasiswa/:npm', (req, res) => {
+	var params = req.params
+
+	connection.query('SELECT count(*) total FROM mahasiswa WHERE npm = ?', [params.npm], function (err, rows, fields) {
+		if (err) throw err
+
+		if (rows[0].total != '0') {
+			connection.query('DELETE FROM mahasiswa WHERE npm = ?', [params.npm], function (err2, rows2, fields2) {
+			  if (err) throw err
+
+			  res.json({'status' : true})
+			})
+		} else {
+			res.json({'status' : false, 'description' : 'NPM is not exist!'})
+		}
 	})
 })
