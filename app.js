@@ -19,7 +19,15 @@ var connection = mysql.createConnection({
   database : 'node_crud'
 });
 
-app.listen(3000, () => console.log('Example app listening on port 3000!'))
+let port = 3000;
+app.listen(port, () => 
+	console.log(
+		'APP Running on port '
+		+ port
+		+ "\n"
+		+ 'Listening http://localhost:' + port + '/'
+		+ "\n"
+		+ 'Created by AgungDH'))
 
 app.get('/', (req, res) => res.send('Hello World!'))
 
