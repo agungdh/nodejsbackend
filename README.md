@@ -1,6 +1,8 @@
-# Frontend Angular
+# Backend NodeJS
 
 ## Run the app
+* create mysql database: node_crud
+* import from db/node_crud.sql
 * npm install
 * node app.js
 ## Videos
